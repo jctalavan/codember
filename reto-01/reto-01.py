@@ -1,6 +1,6 @@
 import requests
 
-def procesar_lista(lines):
+def process_response_content(lines):
     users = list()
     current_user_data = ""
 
@@ -61,7 +61,7 @@ response = requests.get('https://codember.dev/users.txt')
 lines = response.text.split('\n')
 
 if __name__ == "__main__":
-    users = procesar_lista(lines)
+    users = process_response_content(lines)
     valid_users = filter_valid_users(users)
 
     #Number of correct users and last user name
