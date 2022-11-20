@@ -1,63 +1,65 @@
 import requests
+import json
 
 def process_colors(colors) -> str:
 
-    zebra_colors = ["", ""]
-    current_counter = 0
-    max_counter = 0
+    current = list()
+    max = list()
+    color_a = ""
+    color_b = ""
     compare_to = 0
-    last_zebra_color = ""
 
     for color in colors:
-        if(zebra_colors[0] == ""):
-            zebra_colors[0] = color
-            current_counter = 1
-            last_zebra_color = color
+        
+        if(color_a == ""):
+            color_a = color
+            current.append(color)
             continue
 
-        if(zebra_colors[0] != "" and zebra_colors[1] == ""):
-            if(zebra_colors[0] == color):
+        if(color_b == ""):
+            
+            if(color == color_a):
                 continue
-            else:
-                zebra_colors[1] = color
-                current_counter = 2
-                last_zebra_color = color
-                continue
+            
+            color_b = color
+            current.append(color)
+            continue
 
-        if(compare_to == 0):
-            if(zebra_colors[0] == color):
-                current_counter += 1
-                last_zebra_color = color
-                compare_to = 1
-            else:
-                if(current_counter > max_counter):
-                    max_counter = current_counter
-                
-                zebra_colors[0] = zebra_colors[1]
-                zebra_colors[1] = color
-                current_counter = 2
+        if(compare_to == 0 and color == color_a):
+            current.append(color)
+            compare_to = 1
+        elif(compare_to == 1 and color == color_b):
+            current.append(color)
+            compare_to = 0
         else:
-            if(zebra_colors[1] == color):
-                current_counter += 1
-                last_zebra_color = color
-                compare_to = 0
-            else:
-                if(current_counter > max_counter):
-                    max_counter = current_counter
+            if(len(current) >= len(max)):
+                max = current.copy()
+                
+            color_a = current[-1]
+            color_b = color
+            current.clear()
+            current.append(color_a)
+            current.append(color_b)
+            compare_to = 0
 
-                zebra_colors[0] = zebra_colors[1]
-                zebra_colors[1] = color
-                current_counter = 2
+    if(len(current) >= len(max)):
+        max = current.copy()
 
-    if(max_counter == 0):
-        max_counter = current_counter
-
-    return f"{max_counter}@{last_zebra_color}"
+    return f"{len(max)}@{max[-1]}"
 
 if __name__ == "__main__":
 
-    # response = requests.get('https://codember.dev/colors.txt')
-    # colors = response.text
+    # colors = ['red', 'blue', 'red', 'blue', 'green'] #-> 4, blue
+    # colors = ['green', 'red', 'blue', 'gray'] #-> 2, gray
+    # colors = ['blue', 'blue', 'blue', 'blue'] #-> 1, blue
+    # colors = ['red', 'green', 'red', 'green', 'red', 'green'] #-> 6, green
+    # colors = ['blue', 'red', 'blue', 'red', 'gray'] #-> 4, red
+    # colors = ['red', 'red', 'blue', 'red', 'red', 'red', 'green'] #-> 3, red
+    # colors = ['red', 'blue', 'red', 'green', 'red', 'green', 'red', 'green'] #-> 6, green
 
-    colors = ['green', 'red', 'blue', 'gray']
+    response = requests.get('https://codember.dev/colors.txt')
+    
+    # Convert data to dict
+    colors = json.loads(response.text.replace('\n',''))
+ 
     print(process_colors(colors))
