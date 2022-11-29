@@ -1,28 +1,46 @@
-def killMecenas(mecenas: list) -> list:
+import requests
+import json
 
-    if len(mecenas) == 1:
-        return mecenas
+class Mecena:
+    def __init__ (self, initial_position, name):
+        # self allows to attach parameter to the class
+          self.initial_position = initial_position
+          self.name = name
 
-    int indice = 0;
+def killitems(items: list) -> list:
 
-    if len(numbers) % == 0:
-        while indice < len(numbers):
-            survivors.append(numbers[indice])
-            indice+=2
+    if len(items) == 1:
+        return items
+
+    position = 0
+    survivors = list()
+
+    if len(items) % 2 == 0:
+        while position < len(items):
+            survivors.append(items[position])
+            position+=2
 
     else:
-        survivors.append(numbers(-1))
-        while indice < len(numbers) - 1:
-            survivors.append(numbers[indice])
-            indice+=2
+        survivors.append(items[-1])
+        while position < len(items) - 1:
+            survivors.append(items[position])
+            position+=2
 
     return survivors
 
 if __name__ == "__main__":
 
-    mecenas = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
-    
-    while len(mecenas) > 1:
-        mecenas = killMecenas(mecenas)
+    # items = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
 
-    print(mecenas[0])
+    response = requests.get('https://codember.dev/mecenas.json')
+    items = json.loads(response.text.replace('\n',''))
+
+    mecenas = list()
+    for index, item in enumerate(items):
+        mecena = Mecena(index, item)
+        mecenas.append(mecena)
+
+    while len(mecenas) > 1:
+        mecenas = killitems(mecenas)
+
+    print(f"{mecenas[0].name}-{mecenas[0].initial_position}")
